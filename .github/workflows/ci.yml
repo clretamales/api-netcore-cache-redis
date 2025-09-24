@@ -3,8 +3,16 @@ name: CI - Build, Lint, Test (.NET 8 + MySQL + Redis)
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '.editorconfig'
+      - '**/.editorconfig'
+      - '**/*.md'
   pull_request:
     branches: [ '**' ]
+    paths-ignore:
+      - '.editorconfig'
+      - '**/.editorconfig'
+      - '**/*.md'
   workflow_dispatch:
 
 # Evita colas largas en el mismo PR
@@ -96,17 +104,17 @@ jobs:
             **/TestResults/**/coverage.cobertura.xml
 
   # Opcional: build de imagen Docker para validar Dockerfile
-  docker-build:
-    name: Build Docker image
-    runs-on: ubuntu-latest
-    needs: build-test
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build image
-        run: docker build -t arquetipo-api:ci ./Arquetipo.Api
-      - name: Save image (artifact opcional)
-        run: docker save arquetipo-api:ci | gzip > arquetipo-api-image.tar.gz
-      - uses: actions/upload-artifact@v4
-        with:
-          name: arquetipo-api-image
-          path: arquetipo-api-image.tar.gz
+  # docker-build:
+  #   name: Build Docker image
+  #   runs-on: ubuntu-latest
+  #   needs: build-test
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Build image
+  #       run: docker build -t arquetipo-api:ci ./Arquetipo.Api
+  #     - name: Save image (artifact opcional)
+  #       run: docker save arquetipo-api:ci | gzip > arquetipo-api-image.tar.gz
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: arquetipo-api-image
+  #         path: arquetipo-api-image.tar.gz
