@@ -1,0 +1,102 @@
+@HostAddress = http://localhost:8080
+
+###
+# GET Obtiene Numero Random V1
+GET {{HostAddress}}/api/v1/Random/number
+Accept: application/json
+
+###
+# GET Obtiene Numero Random V2
+GET {{HostAddress}}/api/v2/Random/number
+Accept: application/json
+
+###
+# GET Obtiene Response de ejemplo V1
+GET {{HostAddress}}/api/v1/Random/exampleResponse
+Accept: application/json
+
+###
+# GET Obtiene Response de ejemplo V2
+GET {{HostAddress}}/api/v2/Random/exampleResponse
+Accept: application/json
+
+###
+# GET Obtiene Response Error aleatorio V2
+GET {{HostAddress}}/api/v2/Random/error
+Accept: application/json
+
+
+###
+# POST Crea un Item de Random V1
+POST {{HostAddress}}/api/v1/Random
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 4,
+  "descripcion": "Descripcion Objeto",
+  "fecha": "2015-06-19"
+}
+
+###
+# PUT Actualiza un Item de Random V2 (ID)
+PUT {{HostAddress}}/api/v2/Random/3
+Content-Type: application/json
+Accept: application/json
+
+
+###
+# DELETE Elimina un Item de Random V2 (ID)
+DELETE {{HostAddress}}/api/v2/Random/1
+Accept: application/json
+
+####################################
+####################################
+
+###
+# GET HealthCheck
+GET {{HostAddress}}/api/HealthCheck
+Accept: application/json
+
+####################################
+####################################
+
+###
+# GET Obtiene usuario por ID V1
+GET {{HostAddress}}/api/v1/usuario/2
+Accept: application/json
+
+
+###
+# POST Crea un Usuario  V1
+POST {{HostAddress}}/api/v1/usuario
+Content-Type: application/json
+Accept: application/json
+
+[{
+  "nombres": "Andres Soto",
+  "mail": "a.soto@aa.cl"
+},
+{
+  "nombres": "Antonio Lagos",
+  "mail": "alagos@mail.excon"
+}]
+
+
+###
+# PUT Actualiza un Usuario
+PUT {{HostAddress}}/api/v1/usuario
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "nombres": "Andres Soto",
+  "mail": "a.soto@aa.cl"
+}
+
+
+###
+# DELTE Obtiene usuario por ID V1
+DELETE {{HostAddress}}/api/v1/usuario/1
+Accept: application/json

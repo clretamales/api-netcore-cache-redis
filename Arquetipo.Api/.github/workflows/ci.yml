@@ -1,0 +1,115 @@
+name: CI - Build, Lint, Test (.NET 8 + MySQL + Redis)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ '**' ]
+  workflow_dispatch:
+
+# Evita colas largas en el mismo PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    # Usamos contenedor .NET → los services se alcanzan por hostname
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:8.0
+      options: --user root
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: appdb
+          MYSQL_USER: app
+          MYSQL_PASSWORD: app
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping || exit 1"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      # Conexiones que recogerá tu app/tests
+      ConnectionStrings__ConexionMySql: Server=mysql;Port=3306;Database=appdb;User ID=app;Password=app;SslMode=None;Allow User Variables=true;
+      Redis__Configuration: redis:6379
+      Redis__InstanceName: api-cache:
+      Cache__DefaultTtlSeconds: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore Arquetipo.sln
+
+      - name: Build (Release, warn as error)
+        run: dotnet build Arquetipo.sln -c Release --no-restore -warnaserror
+
+      - name: Lint (dotnet-format verify)
+        run: |
+          dotnet tool install -g dotnet-format
+          ~/.dotnet/tools/dotnet-format --verify-no-changes
+        continue-on-error: true   # en POC, que no bloquee
+
+      # Si tus tests de integración necesitan esperar a MySQL:
+      - name: Wait for MySQL to be ready
+        run: |
+          apt-get update && apt-get install -y mysql-client redis-tools
+          until mysqladmin ping -h mysql -uapp -papp --silent; do echo "waiting mysql..."; sleep 3; done
+          redis-cli -h redis ping
+
+      - name: Test (with coverage)
+        run: |
+          dotnet test Arquetipo.sln -c Release --no-build \
+            --logger "trx;LogFileName=test-results.trx" \
+            --collect "XPlat Code Coverage"
+
+      - name: Upload test results & coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            **/TestResults/**/*.trx
+            **/TestResults/**/coverage.cobertura.xml
+
+  # Opcional: build de imagen Docker para validar Dockerfile
+  docker-build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t arquetipo-api:ci ./Arquetipo.Api
+      - name: Save image (artifact opcional)
+        run: docker save arquetipo-api:ci | gzip > arquetipo-api-image.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arquetipo-api-image
+          path: arquetipo-api-image.tar.gz

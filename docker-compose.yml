@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASS}
+      MYSQL_DATABASE:     ${DB_NAME}
+      MYSQL_USER:         ${DB_USER}
+      MYSQL_PASSWORD:     ${DB_PASS}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - arquetipo-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${ROOT_PASS} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    networks:
+      - arquetipo-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - arquetipo-net
+    volumes:
+      - redisinsight_data:/data
+
+  arquetipo-api:
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - Redis__Configuration=${REDIS_CONNECTION}
+      - Redis__InstanceName=${REDIS_INSTANCE}
+      - Cache__DefaultTtlSeconds=${CACHE_TTL_SECONDS}
+    build:
+      context: ./Arquetipo.Api
+      dockerfile: Dockerfile
+    image: arquetipo-api:latest
+    container_name: arquetipo-api
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    networks:
+      - arquetipo-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/api/healthcheck"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  mysql-data:
+  redisinsight_data:
+  
+networks:
+  arquetipo-net:
+    external: true
