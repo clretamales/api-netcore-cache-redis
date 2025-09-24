@@ -3,8 +3,16 @@ name: CI - Build, Lint, Test (.NET 8 + MySQL + Redis)
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '.editorconfig'
+      - '**/.editorconfig'
+      - '**/*.md'
   pull_request:
     branches: [ '**' ]
+    paths-ignore:
+      - '.editorconfig'
+      - '**/.editorconfig'
+      - '**/*.md'
   workflow_dispatch:
 
 # Evita colas largas en el mismo PR

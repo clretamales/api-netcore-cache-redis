@@ -17,6 +17,7 @@ public class UsuarioHandler : IUsuarioHandler
 
     public async Task<DataUsuario> GetUsuarioAsync(int? id)
     {
+        _logger.LogInformation("Iniciando consulta de usuario por id {id}", id);
         var respuesta = new DataUsuario();
         var user = await _usuarioRepository.GetUserByIdAsync(id);
         if (user is not null)
