@@ -70,13 +70,6 @@ jobs:
       - name: Build (Release, warn as error)
         run: dotnet build Arquetipo.sln -c Release --no-restore -warnaserror
 
-      - name: Lint (dotnet-format verify)
-        run: |
-          dotnet tool install -g dotnet-format
-          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-          dotnet format ./Arquetipo.sln --verify-no-changes --no-restore
-        continue-on-error: true   # en POC, que no bloquee
-
       # Si tus tests de integración necesitan esperar a MySQL:
       - name: Wait for MySQL to be ready
         run: |
