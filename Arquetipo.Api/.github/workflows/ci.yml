@@ -45,9 +45,9 @@ jobs:
 
     env:
       # Conexiones que recogerá tu app/tests
-      ConnectionStrings__ConexionMySql: Server=mysql;Port=3306;Database=appdb;User ID=app;Password=app;SslMode=None;Allow User Variables=true;
-      Redis__Configuration: redis:6379
-      Redis__InstanceName: api-cache:
+      ConnectionStrings__ConexionMySql: 'Server=mysql;Port=3306;Database=appdb;User ID=app;Password=app;SslMode=None;Allow User Variables=true;'
+      Redis__Configuration: 'redis:6379'
+      Redis__InstanceName: 'api-cache:'
       Cache__DefaultTtlSeconds: 60
 
     steps:
