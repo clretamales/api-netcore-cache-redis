@@ -10,17 +10,19 @@ namespace Arquetipo.Api.Infrastructure;
 public class UsuarioRepository : IUsuarioRepository
 {
     private readonly ILogger<UsuarioRepository> _logger;
-    private readonly IOptionsSnapshot<ConnectionStrings> options;
+    private readonly IOptionsSnapshot<ConnectionStrings> _options;
     public UsuarioRepository(ILogger<UsuarioRepository> logger,
                             IOptionsSnapshot<ConnectionStrings> options)
     {
         _logger = logger;
-        this.options = options;
+        _options = options;
     }
 
     public async Task<UsuarioDTO> GetUserByIdAsync(int? id)
     {
-        var connectionString = options.Value.ConexionMySql;
+        _logger.LogInformation("Getting user by id: {Id}", id);
+        
+        var connectionString = _options.Value.ConexionMySql;
         var respuesta = new UsuarioDTO();
         var sql = @"
                 SELECT 
@@ -38,7 +40,7 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task PostUsersAsync(List<UsuarioPost> param)
     {
-        var connectionString = options.Value.ConexionMySql;
+        var connectionString = _options.Value.ConexionMySql;
 
         var sql = @"
                 INSERT INTO usuario (nombre_usuario, email)
@@ -52,7 +54,7 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task UpdateUsersAsync(UsuarioUpdate param)
     {
-        var connectionString = options.Value.ConexionMySql;
+        var connectionString = _options.Value.ConexionMySql;
 
         var sql = @"
                 UPDATE usuario 
@@ -68,7 +70,7 @@ public class UsuarioRepository : IUsuarioRepository
     
     public async Task DeleteUsersAsync(int? id)
     {
-        var connectionString = options.Value.ConexionMySql;
+        var connectionString = _options.Value.ConexionMySql;
 
         var sql = @"
                 DELETE FROM usuario 

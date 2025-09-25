@@ -1,6 +1,6 @@
 using Arquetipo.Api.Models.Response.Random;
 
-namespace Arquetipo.Api.Handlers;
+namespace Arquetipo.Api.Handlers.Mapper;
 
 public static class RandomHandlerMapper
 {
