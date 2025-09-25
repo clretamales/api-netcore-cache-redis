@@ -1,5 +1,6 @@
 using System.Text;
 using Arquetipo.Api.Configuration;
+using Arquetipo.Api.Configuration.Caching;
 using Arquetipo.Api.Controllers;
 using Arquetipo.Api.Handlers;
 using Arquetipo.Api.Infrastructure;
@@ -31,6 +32,10 @@ public class Startup
         services.AddOptions<ConnectionStrings>()
             .Bind(Configuration.GetSection(ConnectionStrings.Seccion))
             .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddOptions<CacheOptions>()
+            .Bind(Configuration.GetSection(CacheOptions.Seccion))
+            .Validate(o => o.DefaultTtlSeconds > 0, "Cache TTL must be > 0")
             .ValidateOnStart();
     }
 
@@ -76,12 +81,23 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCustomMvc(this IServiceCollection services, IConfiguration configuration)
     {
+        var redisConn = configuration["Redis:Configuration"] ?? "redis:6379";
+        var instance  = configuration["Redis:InstanceName"] ?? "api-cache:";
+
+        services.AddStackExchangeRedisCache(o =>
+        {
+            o.Configuration = redisConn;
+            o.InstanceName  = instance;
+        });
+
         //services.
         services.AddOptions();
         services.AddScoped<IRandomHandler, RandomHandler>();
         services.AddScoped<IUsuarioHandler, UsuarioHandler>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         // services.AddScoped<IHandlerRandom4, HandlerRandom4>();
+
+        services.AddScoped<IRedisCacheService, RedisCacheService>();
 
         services.AddControllers();
 

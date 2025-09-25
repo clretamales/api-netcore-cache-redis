@@ -48,6 +48,13 @@ dotnet_naming_style.s_prefix.capitalization = camel_case
 dotnet_naming_style.underscore_prefix.required_prefix = _
 dotnet_naming_style.underscore_prefix.capitalization = camel_case
 
+dotnet_style_qualification_for_field = false
+dotnet_style_qualification_for_property = false
+dotnet_style_qualification_for_method = false
+dotnet_style_qualification_for_event = false
+
+dotnet_style_object_initializer = false
+
 # --- Conjuntos de símbolos ---
 # Campos privados static readonly  => s_
 dotnet_naming_symbols.private_static_readonly_fields.applicable_kinds = field
@@ -70,6 +77,10 @@ dotnet_naming_rule.private_readonly_fields_rule.severity = warning
 
 # IDE0052: "El miembro privado ... puede quitarse porque no se lee nunca"
 dotnet_diagnostic.IDE0052.severity = warning
+dotnet_diagnostic.IDE0130.severity = none
+
+dotnet_diagnostic.IDE0160.severity = none
+dotnet_diagnostic.IDE0161.severity = none
 
 [**/*Tests*/**/*.cs]
 dotnet_diagnostic.IDE0052.severity = suggestion

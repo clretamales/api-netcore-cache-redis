@@ -1,3 +1,4 @@
+using Arquetipo.Api.Handlers.Mapper;
 using Arquetipo.Api.Models.Response;
 using Arquetipo.Api.Models.Response.Random;
 

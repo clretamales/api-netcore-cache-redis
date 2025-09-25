@@ -33,6 +33,8 @@ namespace Arquetipo.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> GetUser(int? id)
         {
+            _logger.LogInformation("Getting user by id: {Id}", id);
+            
             var user = await _usuarioHandler.GetUsuarioAsync(id);
             if (user.Data is null) return NoContent();
             return Ok(user);
