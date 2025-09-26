@@ -54,6 +54,17 @@ Accept: application/json
 ####################################
 
 ###
+# GET HealthCheck Redis
+GET {{HostAddress}}/api/HealthCheck/redis
+Accept: application/json
+
+
+###
+# GET HealthCheck Redis
+GET {{HostAddress}}/api/HealthCheck/db
+Accept: application/json
+
+###
 # GET HealthCheck
 GET {{HostAddress}}/api/HealthCheck
 Accept: application/json
@@ -63,7 +74,7 @@ Accept: application/json
 
 ###
 # GET Obtiene usuario por ID V1
-GET {{HostAddress}}/api/v1/usuario/2
+GET {{HostAddress}}/api/v1/usuario/1
 Accept: application/json
 
 

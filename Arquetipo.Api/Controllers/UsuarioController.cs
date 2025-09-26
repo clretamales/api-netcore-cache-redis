@@ -2,7 +2,6 @@ using Arquetipo.Api.Handlers;
 using Arquetipo.Api.Infrastructure;
 using Arquetipo.Api.Models.Request;
 using Arquetipo.Api.Models.Response.Usuario;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Arquetipo.Api.Controllers
