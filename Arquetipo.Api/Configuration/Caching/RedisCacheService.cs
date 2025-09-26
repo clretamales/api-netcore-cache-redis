@@ -8,9 +8,8 @@ public class RedisCacheService : IRedisCacheService
     private readonly IDistributedCache _cache;
     private readonly ILogger<RedisCacheService> _logger;
 
-    public RedisCacheService(
-        IDistributedCache cache,
-        ILogger<RedisCacheService> logger)
+    public RedisCacheService(IDistributedCache cache,
+                            ILogger<RedisCacheService> logger)
     {
         _cache  = cache;
         _logger = logger;
